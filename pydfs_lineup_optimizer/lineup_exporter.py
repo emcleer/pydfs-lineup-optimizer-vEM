@@ -66,6 +66,21 @@ class FantasyDraftCSVLineupExporter(LineupExporter):
             writer = csv.writer(csvfile)
             writer.writerows(lines)
 
+class DataFrameLineupExporter(LineupExporter):
+    def export(self, render_func=None):
+        rows = []
+        try:
+            for index, lineup in enumerate(self.lineups):
+                if index == 0:
+                    pass
+                row = [(render_func or self.render_player)(player) for player in lineup.lineup]
+                row.append(str(lineup.salary_costs))
+                row.append(str(lineup.fantasy_points_projection))
+                rows.append(row)
+            import pandas as pd
+            return pd.DataFrame(rows)
+        except (ImportError, ModuleNotFoundError):
+            return rows
 
 class YahooCSVLineupExporter(CSVLineupExporter):
     @staticmethod
